@@ -1,0 +1,316 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String
+  phone    Int    @unique
+  password String
+
+  @@map("user")
+}
+
+model Barcodes {
+  id         Int      @id @default(autoincrement())
+  id_        Int      @unique
+  itemId     Int
+  itemUnitId Int      @unique
+  unitId     Int
+  lineNr     Int
+  barcode    String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  Items         Items           @relation(fields: [itemId], references: [id_])
+  Units         Units           @relation(fields: [unitId], references: [id_])
+  ItemsBarcodes ItemsBarcodes[]
+
+  @@map("barcodes")
+}
+
+model Brands {
+  id        Int      @id @default(autoincrement())
+  id_       Int      @unique
+  code      String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Items Items[]
+
+  @@map("brands")
+}
+
+model Cases {
+  id         Int      @id @default(autoincrement())
+  id_        Int      @unique
+  code       String
+  name       String
+  address    String?
+  address2   String?
+  divisionNr Int?
+  currencyId Int
+  active     Boolean
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  Currency Currencies @relation(fields: [currencyId], references: [id_])
+
+  @@map("cases")
+}
+
+model Clients {
+  id               Int      @id @default(autoincrement())
+  id_              Int      @unique
+  code             String
+  name             String
+  name2            String?
+  active           Boolean?
+  cardType         Int?
+  eCode            String?
+  address          String?
+  address2         String?
+  district         String?
+  town             String?
+  city             String?
+  cityCode         String?
+  country          String?
+  countryCode      String?
+  phoneNumber      String?
+  phoneNumber2     String?
+  email            String?
+  email2           String?
+  email3           String?
+  incharge         String?
+  incharge2        String?
+  incharge3        String?
+  webAddress       String?
+  birthDate        String?
+  exchangeRateType Int?
+  Exchange         Float?
+  discount         Int?
+  specode          String?
+  specode2         String?
+  specode3         String?
+  specode4         String?
+  specode5         String?
+  cyphcode         String?
+  cardNo           String?
+  guid             String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("clients")
+}
+
+model Currencies {
+  id           Int       @id @default(autoincrement())
+  id_          Int       @unique
+  code         String
+  name         String
+  symbol       String?
+  activelyUsed Boolean?
+  lastRate1    Float?
+  lastRate2    Float?
+  lastRate3    Float?
+  lastRate4    Float?
+  lastRateDate DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  Cases  Cases[]
+  Prices Prices[]
+
+  @@map("currencies")
+}
+
+model DiscountCards {
+  id        Int      @id @default(autoincrement())
+  id_       Int      @unique
+  code      String
+  name      String
+  cyphcode  String?
+  specode   String?
+  type      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("discount_cards")
+}
+
+model Divisions {
+  id        Int      @id @default(autoincrement())
+  id_       Int      @unique
+  nr        Int      @unique
+  name      String
+  street    String?
+  doorNr    String?
+  district  String?
+  city      String?
+  country   String?
+  zipCode   String?
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("divisions")
+}
+
+model Units {
+  id        Int      @id @default(autoincrement())
+  id_       Int      @unique
+  code      String
+  name      String
+  unitSetId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  UnitSets  UnitSets?   @relation(fields: [unitSetId], references: [id_])
+  Prices    Prices[]
+  Barcodes  Barcodes[]
+  Items     Items[]
+  ItemUnits ItemUnits[]
+
+  @@map("units")
+}
+
+model UnitSets {
+  id        Int      @id @default(autoincrement())
+  id_       Int      @unique
+  code      String
+  name      String
+  specode   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Units Units[]
+
+  @@map("unit_sets")
+}
+
+model Items {
+  id                 Int      @id @default(autoincrement())
+  id_                Int      @unique
+  status             String?
+  code               String
+  eCode              String?
+  active             Boolean?
+  eActive            Boolean?
+  cardType           Int
+  name               String
+  name2              String?
+  name3              String?
+  name4              String?
+  specode1           String?
+  specode2           String?
+  specode3           String?
+  specode4           String?
+  specode5           String?
+  keyword1           String?
+  keyword2           String?
+  keyword3           String?
+  keyword4           String?
+  keyword5           String?
+  origin             String?
+  category           String?
+  mainUnit           String?
+  mainUnitId         Int?
+  brandId            Int?
+  variationCode      String?
+  reyonCode          String?
+  producerCode       String?
+  salesLimitQuantity Int?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  Brands        Brands?         @relation(fields: [brandId], references: [id_])
+  Units         Units?          @relation(fields: [mainUnitId], references: [id_])
+  Barcodes      Barcodes[]
+  Prices        Prices[]
+  ItemsBarcodes ItemsBarcodes[]
+  ItemUnits     ItemUnits[]
+
+  @@map("items")
+}
+
+model ItemUnits {
+  id              Int      @id @default(autoincrement())
+  id_             Int      @unique
+  unitId          Int?
+  itemId          Int?
+  mainUnit        Boolean?
+  lineNr          Int?
+  coefficient     Int?
+  eActive         Boolean?
+  width           Int?
+  widthUnit       String?
+  length          Int?
+  lengthUnit      String?
+  height          Int?
+  heightUnit      String?
+  area            Int?
+  areaUnit        String?
+  volume          Int?
+  volumeUnit      String?
+  weight          Int?
+  weightUnit      String?
+  grossvolume     Int?
+  grossvolumeUnit String?
+  grossweight     Int?
+  grossweightUnit String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  Unit Units? @relation(fields: [unitId], references: [id_])
+  Item Items? @relation(fields: [itemId], references: [id_])
+
+  @@map("item_units")
+}
+
+model Prices {
+  id         Int      @id @default(autoincrement())
+  id_        Int      @unique
+  code       String
+  itemId     Int
+  priority   Int?
+  clentcode  String?
+  clcyphcode String?
+  clspecode  String?
+  clspecode2 String?
+  clspecode3 String?
+  clspecode4 String?
+  clspecode5 String?
+  active     Boolean?
+  divisions  Int[]
+  price      Float
+  type       Int?
+  unitId     Int?
+  currencyId Int
+  beginTime  String?
+  endTime    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  Items      Items      @relation(fields: [itemId], references: [id_])
+  Currencies Currencies @relation(fields: [currencyId], references: [id_])
+  Units      Units?     @relation(fields: [unitId], references: [id_])
+
+  @@map("prices")
+}
+
+model ItemsBarcodes {
+  id         Int  @id @default(autoincrement())
+  barcodesId Int?
+  itemsId    Int?
+
+  Barcodes Barcodes? @relation(fields: [barcodesId], references: [id])
+  Items    Items?    @relation(fields: [itemsId], references: [id])
+
+  @@map("items_barcodes")
+}
